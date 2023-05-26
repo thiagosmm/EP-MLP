@@ -6,11 +6,11 @@
 
 import random
 import math
-import numpy as np
-import pandas as pd
+#import numpy as np
+#import pandas as pd
 
 def activation_function(t):
-    return (1/(1 + math.exp(-t)))
+    return (1 - math.exp(-t)/(1 + math.exp(-t)))
 
 def derivada_activation(f):
     return (f * (1 - f))
@@ -27,7 +27,6 @@ def mlp_forward(input, hidden, output, weights_hidden, weights_output):
     for i in range(len(input)):
         for j in range(len(hidden)):
            hidden[j] += input[i] * weights_hidden[i][j]
-    print(hidden)
 
 # função de ativação nos neuronios da hidden 
     for i in range(len(hidden)):
@@ -44,16 +43,23 @@ def mlp_forward(input, hidden, output, weights_hidden, weights_output):
 
     return output, weights_hidden, weights_output
 
-#def mlp_backpropagation(output, saida_esperada, weights_hidden, weights_output):
-
+def mlp_backpropagation(output, target, weights_hidden, weights_output):
+    erro = 0 
+    for i in range(len(output)):
+        erro += 0.5*((target[i] - output[i])**2)
+    print(erro)
 
 def main():
+    lRate = 0.1
+    epocs = 1000
+    maxError = 0.1 
     input = [-1,-1,1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,1,1,1,1,1,-1,-1,1,-1,-1,-1,1,-1,-1,1,-1,-1,-1,1,-1,1,1,1,-1,1,1,1]
-    saida_esperada = [1,-1,-1,-1,-1,-1,-1]
+    target = [1,-1,-1,-1,-1,-1,-1]
     hidden = [0] * 7
     output = [0] * 7
     weights_hidden, weights_output = mlp_architecture(len(input), len(hidden), len(output))
     output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
+    mlp_backpropagation(output, target, weights_hidden, weights_output)
 
    #print(random.uniform(-1, 1))
 
