@@ -5,6 +5,8 @@
 #       7 neuronios na camada de saida
 #       função de ativaçao: sigmoid
 
+# arrumar testes - iteração sobre épocas
+
 import random
 import math
 #import numpy as np
@@ -16,9 +18,12 @@ def activation_function(t):
 def derivada_activation(f):
     return (f * (1 - f))
 
-def mlp_architecture(input_lenght, hidden_lenght, output_lenght):
-    weights_hidden = [[random.uniform(-0.5, 0.5) for _ in range(input_lenght)] for _ in range(hidden_lenght)]
-    weights_output = [[random.uniform(-0.5, 0.5) for _ in range(hidden_lenght)] for _ in range(output_lenght)]
+def mlp_architecture(input_length, hidden_length, output_length):
+    weights_hidden = [[random.uniform(-0.5, 0.5) for _ in range(hidden_length)] for _ in range(input_length)]
+    weights_output = [[random.uniform(-0.5, 0.5) for _ in range(output_length)] for _ in range(hidden_length)]
+
+    matriz = [[random.uniform(-0.5, 0.5) for _ in range(3)] for _ in range(2)]
+    print(matriz)
 
     return weights_hidden, weights_output
 
@@ -27,7 +32,7 @@ def mlp_forward(input, hidden, output, weights_hidden, weights_output):
 # combinação linear entradas com pesos para hidden
     for i in range(len(input)):
         for j in range(len(hidden)):
-           hidden[j] += input[i] * weights_hidden[j][i]
+           hidden[j] += input[i] * weights_hidden[i][j]
 
 # função de ativação nos neuronios da hidden 
     for i in range(len(hidden)):
@@ -57,32 +62,35 @@ def mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_o
     for i in range(len(output)):
         deltaOutput[i] = (target[i] - output[i]) * derivada_activation(output[i])
         for j in range(len(hidden)):
-            weights_output[i][j] = weights_output[i][j] + lRate * deltaOutput[i] * hidden[j]
-            deltaHidden[i] += deltaOutput[i] * weights_output[i][j] * derivada_activation(hidden[i]) #verificar
+            weights_output[i][j] += lRate * deltaOutput[i] * hidden[j]
+            deltaHidden[i] += deltaOutput[i] * weights_output[i][j] * derivada_activation(hidden[j]) #verificar
 
 #  backpropagation hidden -> input
     for i in range(len(input)):
         for j in range(len(hidden)):
-            weights_hidden[j][i] = weights_hidden[j][i] * lRate * input[j] 
+            weights_hidden[i][j] += deltaHidden[j] * lRate * input[j] 
     
     return output, hidden, weights_hidden, weights_output
 
 def main():
     lRate = 0.1
-    epocs = 10000
+    epocs = 1000
     maxError = 0.1
-    input_lenght = 63 
-    hidden_lenght = 7
-    output_lenght = 7
-    weights_hidden, weights_output = mlp_architecture(input_lenght, hidden_lenght, output_lenght)
+    input_length = 63 
+    hidden_length = 7
+    output_length = 7
+    weights_hidden, weights_output = mlp_architecture(input_length, hidden_length, output_length)
 
     for i in range(epocs):
         input = [-1,-1,1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,1,1,1,1,1,-1,-1,1,-1,-1,-1,1,-1,-1,1,-1,-1,-1,1,-1,1,1,1,-1,1,1,1]
         target = [1,-1,-1,-1,-1,-1,-1]
-        hidden = [0] * hidden_lenght
-        output = [0] * output_lenght
+        hidden = [0] * hidden_length
+        output = [0] * output_length
         hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
         output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
+        input= []
+        target = []
+
 
     print(weights_hidden, '\n', weights_output)
 
