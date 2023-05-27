@@ -19,11 +19,9 @@ def derivada_activation(f):
     return (f * (1 - f))
 
 def mlp_architecture(input_length, hidden_length, output_length):
-    weights_hidden = [[random.uniform(-0.5, 0.5) for _ in range(hidden_length)] for _ in range(input_length)]
-    weights_output = [[random.uniform(-0.5, 0.5) for _ in range(output_length)] for _ in range(hidden_length)]
-
-    matriz = [[random.uniform(-0.5, 0.5) for _ in range(3)] for _ in range(2)]
-    print(matriz)
+    weights_hidden = [[round(random.uniform(-50000, 50000) / 100000, 5) for _ in range(hidden_length)] for _ in range(input_length)]
+    weights_output = [[round(random.uniform(-50000, 50000) / 100000, 5) for _ in range(output_length)] for _ in range(hidden_length)]
+    print(weights_output)
 
     return weights_hidden, weights_output
 
@@ -74,7 +72,7 @@ def mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_o
 
 def main():
     lRate = 0.1
-    epocs = 1000
+    epocs = 250
     maxError = 0.1
     input_length = 63 
     hidden_length = 7
@@ -88,13 +86,12 @@ def main():
         output = [0] * output_length
         hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
         output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
-        input= []
-        target = []
+        print('época numero: ', i, 'output: ', output)
 
 
-    print(weights_hidden, '\n', weights_output)
+    #print(weights_hidden, '\n', weights_output)
 
-   #print(random.uniform(-1, 1))
+    #print(random.uniform(-1, 1))
 
 
 main()
