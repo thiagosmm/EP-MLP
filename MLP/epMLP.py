@@ -9,18 +9,18 @@
 
 import random
 import math
-#import numpy as np
+import numpy as np
 #import pandas as pd
 
 def activation_function(t):
-    return (1/(1 + math.exp(-t)))
+    return (1/(1 + np.exp(-t)))
 
 def derivada_activation(f):
     return (f * (1 - f))
 
 def mlp_architecture(input_length, hidden_length, output_length):
-    weights_hidden = [[round(random.uniform(-50000, 50000) / 100000, 5) for _ in range(hidden_length)] for _ in range(input_length)]
-    weights_output = [[round(random.uniform(-50000, 50000) / 100000, 5) for _ in range(output_length)] for _ in range(hidden_length)]
+    weights_hidden = [[round(random.uniform(-50000, 50000) / 100000, 1) for _ in range(hidden_length)] for _ in range(input_length)]
+    weights_output = [[round(random.uniform(-50000, 50000) / 100000, 1) for _ in range(output_length)] for _ in range(hidden_length)]
     print(weights_output)
 
     return weights_hidden, weights_output
@@ -71,8 +71,8 @@ def mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_o
     return output, hidden, weights_hidden, weights_output
 
 def main():
-    lRate = 0.1
-    epocs = 250
+    lRate = 0.2
+    epocs = 10000
     maxError = 0.1
     input_length = 63 
     hidden_length = 7
@@ -87,6 +87,16 @@ def main():
         hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
         output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
         print('época numero: ', i, 'output: ', output)
+        input = [1,1,1,1,1,1,-1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,1,1,1,1,-1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1]
+        target = [-1,1,-1,-1,-1,-1,-1]
+        hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
+        output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
+        print('época numero: ', i, 'output: ', output)
+        erro = 0 
+        for i in range(len(output)):
+            erro += 0.5*((target[i] - output[i])**2)
+        print(' erro: ', erro)
+        if erro < maxError: break
 
 
     #print(weights_hidden, '\n', weights_output)
