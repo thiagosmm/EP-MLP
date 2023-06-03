@@ -86,17 +86,24 @@ def main():
         output = [0] * output_length
         hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
         output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
-        print('época numero: ', i, 'output: ', output)
+        print('época numero: ', i, '\noutput: ', output)
         input = [1,1,1,1,1,1,-1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,1,1,1,1,-1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1]
         target = [-1,1,-1,-1,-1,-1,-1]
         hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
         output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
-        print('época numero: ', i, 'output: ', output)
+        print('output: ', output)
+        input = [-1,-1,1,1,1,1,1,-1,1,-1,-1,-1,-1,1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,1,-1,-1,1,1,1,1,-1]
+        target = [-1,-1,1,-1,-1,-1,-1]
+        hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
+        output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
+        print('output: ', output)
         erro = 0 
         for i in range(len(output)):
             erro += 0.5*((target[i] - output[i])**2)
         print(' erro: ', erro)
-        if erro < maxError: break
+        if erro < maxError: print('parada por erro'); break
+    
+    print('FIM DAS EPOCAS')
 
 
     #print(weights_hidden, '\n', weights_output)
