@@ -1,114 +1,96 @@
 # - ALGORITMO MLP -
 # - problema de identificação de caracteres -
 #       63 neuronios na camada de entrada
-#       7 neuronios na camada escondida
+#       10 neuronios na camada escondida
 #       7 neuronios na camada de saida
-#       função de ativaçao: sigmoid
-
-# arrumar testes - iteração sobre épocas
+#       função de ativaçao: tangente hiberbolica
 
 import random
 import math
 import numpy as np
-#import pandas as pd
+import pandas as pd
 
 def activation_function(t):
-    return (1/(1 + np.exp(-t)))
+    return (np.exp(2*t)-1)/(np.exp(2*t)+1)
 
 def derivada_activation(f):
-    return (f * (1 - f))
+    return (1/np.cosh(f)**2)
 
 def mlp_architecture(input_length, hidden_length, output_length):
-    weights_hidden = [[round(random.uniform(-50000, 50000) / 100000, 1) for _ in range(hidden_length)] for _ in range(input_length)]
-    weights_output = [[round(random.uniform(-50000, 50000) / 100000, 1) for _ in range(output_length)] for _ in range(hidden_length)]
-    print(weights_output)
+    weights_hidden = np.random.uniform(-0.5, 0.5, size=(hidden_length, input_length))
+    weights_output = np.random.uniform(-0.5, 0.5, size=(output_length, hidden_length))
 
     return weights_hidden, weights_output
 
 def mlp_forward(input, hidden, output, weights_hidden, weights_output):
+    hidden = np.dot(weights_hidden, input)
+    hiddenActivation = activation_function(hidden)
 
-# combinação linear entradas com pesos para hidden
-    for i in range(len(input)):
-        for j in range(len(hidden)):
-           hidden[j] += input[i] * weights_hidden[i][j]
+    output = np.dot(weights_output, hiddenActivation)
+    outputFinal = activation_function(output)
 
-# função de ativação nos neuronios da hidden 
-    for i in range(len(hidden)):
-        hidden[i] = activation_function(hidden[i])
+    return hidden, output, hiddenActivation, outputFinal, weights_hidden, weights_output
 
-# combinação linear entradas com pesos para output
-    for i in range(len(hidden)):
-        for j in range(len(output)):
-           output[j] += hidden[i] * weights_output[i][j]
+def mlp_backpropagation(input, output, outputFinal, target, hidden, hiddenActivation, weights_hidden, weights_output, learningRate):
+    deltaOutput = (target - output) * derivada_activation(output)
+    deltaHidden = np.dot(deltaOutput, weights_output) * derivada_activation(hidden)
 
-# função de ativação nos neuronios de saída
-    for i in range(len(hidden)):
-        output[i] = activation_function(output[i])
+    weights_output += learningRate * np.outer(deltaOutput, hiddenActivation)
+    weights_hidden += learningRate * np.outer(deltaHidden, input)
 
-    return hidden, output, weights_hidden, weights_output
+    return output, outputFinal, hidden, weights_hidden, weights_output
 
-def mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate):
-    erroTotal = 0 
-    for i in range(len(output)):
-        erroTotal += 0.5*((target[i] - output[i])**2)
-    #print(erroTotal)
+def extracaoDataTreino():
+    df = pd.read_csv('caracteres-limpo.csv', header=None)
+    inputs = df.iloc[:15, :63].values
+    targets = df.iloc[:15, -7:].values
 
-    deltaOutput = [0] * 7
-    deltaHidden= [0] * 7
-
-# backpropagation output -> hidden
-    for i in range(len(output)):
-        deltaOutput[i] = (target[i] - output[i]) * derivada_activation(output[i])
-        for j in range(len(hidden)):
-            weights_output[i][j] += lRate * deltaOutput[i] * hidden[j]
-            deltaHidden[i] += deltaOutput[i] * weights_output[i][j] * derivada_activation(hidden[j]) #verificar
-
-#  backpropagation hidden -> input
-    for i in range(len(input)):
-        for j in range(len(hidden)):
-            weights_hidden[i][j] += deltaHidden[j] * lRate * input[j] 
-    
-    return output, hidden, weights_hidden, weights_output
+    return inputs, targets
 
 def main():
-    lRate = 0.2
-    epocs = 10000
+    inputs, targets = extracaoDataTreino()
+    learningRate = 0.1
+    epochs = 10000
     maxError = 0.1
-    input_length = 63 
-    hidden_length = 7
+    input_length = 63
+    hidden_length = 10
     output_length = 7
+    hidden = np.zeros(hidden_length)
+    output = np.zeros(output_length)
     weights_hidden, weights_output = mlp_architecture(input_length, hidden_length, output_length)
 
-    for i in range(epocs):
-        input = [-1,-1,1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,1,1,1,1,1,-1,-1,1,-1,-1,-1,1,-1,-1,1,-1,-1,-1,1,-1,1,1,1,-1,1,1,1]
-        target = [1,-1,-1,-1,-1,-1,-1]
-        hidden = [0] * hidden_length
-        output = [0] * output_length
-        hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
-        output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
-        print('época numero: ', i, '\noutput: ', output)
-        input = [1,1,1,1,1,1,-1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,1,1,1,1,-1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,-1,1,-1,-1,-1,-1,1,1,1,1,1,1,1,-1]
-        target = [-1,1,-1,-1,-1,-1,-1]
-        hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
-        output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
-        print('output: ', output)
-        input = [-1,-1,1,1,1,1,1,-1,1,-1,-1,-1,-1,1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,1,-1,-1,1,1,1,1,-1]
-        target = [-1,-1,1,-1,-1,-1,-1]
-        hidden, output, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
-        output, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, target, hidden, weights_hidden, weights_output, lRate)
-        print('output: ', output)
-        erro = 0 
-        for i in range(len(output)):
-            erro += 0.5*((target[i] - output[i])**2)
-        print(' erro: ', erro)
-        if erro < maxError: print('parada por erro'); break
-    
-    print('FIM DAS EPOCAS')
+# TREINAMENTO - 15 primeiras linhas do arquivo csv
 
+    for i in range(len(inputs)):
+        input = inputs[i]
+        target = targets[i]
 
-    #print(weights_hidden, '\n', weights_output)
+        for j in range(epochs):
+            hidden, output, hiddenActivation, outputFinal, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
+            output, outputFinal, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, outputFinal, target, hidden, hiddenActivation, weights_hidden, weights_output, learningRate)
 
-    #print(random.uniform(-1, 1))
+            error = 0.5 * (np.sum(target - outputFinal))**2
+            print('época: ', j, 'valor do erro: ', error)
 
+            if error < maxError:
+                print('parada devido ao valor do erro')
+                break
+
+    print('fim das épocas')
+
+# TESTES - ultimas 6 linhas do arquivo csv
+    dfFinal = pd.read_csv('caracteres-limpo.csv', header=None)
+    entradas = dfFinal.iloc[:-6, :63].values
+    saidasEsperadas = dfFinal.iloc[:-6, -7:].values
+
+# print dos valores finais dos testes
+    for i in range(len(inputs)):
+        input = entradas[i]
+        target = saidasEsperadas[i]
+        hidden, output, hiddenActivation, outputFinal, wsHidden, wsOutput = mlp_forward(input, hidden, output, weights_hidden, weights_output)
+        print('Entrada:', input)
+        print('Target:', target)
+        print('Saída:', outputFinal)
+        print()
 
 main()
