@@ -41,28 +41,19 @@ def mlp_backpropagation(input, output, outputFinal, target, hidden, hiddenActiva
     return output, outputFinal, hidden, weights_hidden, weights_output
 
 def extracaoDataTreino():
-    df1 = pd.read_csv('caracteres-limpo.csv', header=None)
-    inputs = df1.iloc[:14, :63].values
-    targets = df1.iloc[:14, -7:].values
-    df2 = pd.read_csv('caracteres-ruido.csv', header=None)
-    inputs = np.vstack([inputs, df2.iloc[:14, :63].values])
-    targets = np.vstack([targets, df2.iloc[:14, -7:].values])
-    df3 = pd.read_csv('caracteres_ruido20.csv', header=None)
-    inputs = np.vstack([inputs, df3.iloc[:14, :63].values])
-    targets = np.vstack([targets, df3.iloc[:14, -7:].values])
+    df1 = pd.read_csv('caracteres-ruido.csv', header=None)
+    inputs = df1.iloc[ :, :63].values
+    targets = df1.iloc[ :, -7:].values
+    df2 = pd.read_csv('caracteres_ruido20.csv', header=None)
+    inputs = np.vstack([inputs, df2.iloc[:, :63].values])
+    targets = np.vstack([targets, df2.iloc[:, -7:].values])
 
     return inputs, targets
 
 def extracaoDataTeste():
     df1 = pd.read_csv('caracteres-limpo.csv', header=None)
-    inputsTeste = df1.iloc[:-7, :63].values
-    targetsTeste = df1.iloc[:-7, -7:].values
-    df2 = pd.read_csv('caracteres-ruido.csv', header=None)
-    inputsTeste = np.vstack([inputsTeste, df2.iloc[:-7, :63].values])
-    targetsTeste = np.vstack([targetsTeste, df2.iloc[:-7, -7:].values])
-    df3 = pd.read_csv('caracteres_ruido20.csv', header=None)
-    inputsTeste = np.vstack([inputsTeste, df3.iloc[:-7, :63].values])
-    targetsTeste = np.vstack([targetsTeste, df3.iloc[:-7, -7:].values])
+    inputsTeste = df1.iloc[:, :63].values
+    targetsTeste = df1.iloc[:, -7:].values
 
     return inputsTeste, targetsTeste
 
@@ -94,11 +85,11 @@ def main():
     inputsTeste, targetsTeste = extracaoDataTeste()
     #inputs, targets, inputsTeste, targetsTeste = extracaoPortaLogica()
 
-    learningRate = 0.1
+    learningRate = 0.001
     epochs = 10000
-    maxError = 0.1
+    maxError = 0.001
     input_length = 63
-    hidden_length = 63
+    hidden_length = 60
     output_length = 7
     hidden = np.zeros(hidden_length)
     output = np.zeros(output_length)
@@ -124,9 +115,11 @@ def main():
     print('fim das épocas')
 
 # print dos valores finais dos testes
-    for i in range(len(inputs)):
+    for i in range(len(inputsTeste)):
         input = inputsTeste[i]
         target = targetsTeste[i]
+        hidden = np.zeros(hidden_length)
+        output = np.zeros(output_length)
         hidden, output, hiddenActivation, outputFinal, wsHidden, wsOutput = mlp_forward(input, hidden, output, weights_hidden, weights_output)
         print('Entrada:', input)
         print('Target:', target)
