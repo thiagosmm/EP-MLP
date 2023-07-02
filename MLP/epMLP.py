@@ -85,17 +85,17 @@ def main():
     inputsTeste, targetsTeste = extracaoDataTeste()
     #inputs, targets, inputsTeste, targetsTeste = extracaoPortaLogica()
 
-    learningRate = 0.001
+    learningRate = 0.1
     epochs = 10000
-    maxError = 0.001
+    maxError = 0.01
     input_length = 63
-    hidden_length = 60
+    hidden_length = 30
     output_length = 7
     hidden = np.zeros(hidden_length)
     output = np.zeros(output_length)
     weights_hidden, weights_output = mlp_architecture(input_length, hidden_length, output_length)
 
-# TREINAMENTO - 15 primeiras linhas do arquivo csv
+# TREINAMENTO - arquivos .csv que contém ruído
 
     for i in range(len(inputs)):
         input = inputs[i]
@@ -115,6 +115,7 @@ def main():
     print('fim das épocas')
 
 # print dos valores finais dos testes
+    rightAns = 0
     for i in range(len(inputsTeste)):
         input = inputsTeste[i]
         target = targetsTeste[i]
@@ -124,6 +125,11 @@ def main():
         print('Entrada:', input)
         print('Target:', target)
         print('Saída:', outputFinal)
-        print()
+        for i in range(len(target)):
+            if (target[i] > 0) and (outputFinal[i] > 0):
+                print('OUTPUT CORRETO')
+                rightAns += 1
+                break
+    print(rightAns,'/',len(inputsTeste))
 
 main()
