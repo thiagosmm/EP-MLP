@@ -41,19 +41,64 @@ def mlp_backpropagation(input, output, outputFinal, target, hidden, hiddenActiva
     return output, outputFinal, hidden, weights_hidden, weights_output
 
 def extracaoDataTreino():
-    df = pd.read_csv('caracteres-limpo.csv', header=None)
-    inputs = df.iloc[:15, :63].values
-    targets = df.iloc[:15, -7:].values
+    df1 = pd.read_csv('caracteres-limpo.csv', header=None)
+    inputs = df1.iloc[:14, :63].values
+    targets = df1.iloc[:14, -7:].values
+    df2 = pd.read_csv('caracteres-ruido.csv', header=None)
+    inputs = np.vstack([inputs, df2.iloc[:14, :63].values])
+    targets = np.vstack([targets, df2.iloc[:14, -7:].values])
+    df3 = pd.read_csv('caracteres_ruido20.csv', header=None)
+    inputs = np.vstack([inputs, df3.iloc[:14, :63].values])
+    targets = np.vstack([targets, df3.iloc[:14, -7:].values])
 
     return inputs, targets
 
+def extracaoDataTeste():
+    df1 = pd.read_csv('caracteres-limpo.csv', header=None)
+    inputsTeste = df1.iloc[:-7, :63].values
+    targetsTeste = df1.iloc[:-7, -7:].values
+    df2 = pd.read_csv('caracteres-ruido.csv', header=None)
+    inputsTeste = np.vstack([inputsTeste, df2.iloc[:-7, :63].values])
+    targetsTeste = np.vstack([targetsTeste, df2.iloc[:-7, -7:].values])
+    df3 = pd.read_csv('caracteres_ruido20.csv', header=None)
+    inputsTeste = np.vstack([inputsTeste, df3.iloc[:-7, :63].values])
+    targetsTeste = np.vstack([targetsTeste, df3.iloc[:-7, -7:].values])
+
+    return inputsTeste, targetsTeste
+
+def extracaoPortaLogica():
+    df1 = pd.read_csv('problemAND.csv', header=None)
+    inputs = df1.iloc[:4, :2].values
+    targets = df1.iloc[:4, -1:].values
+    df2 = pd.read_csv('problemOR.csv', header=None)
+    inputs = np.vstack([inputs, df2.iloc[:4, :2]])
+    targets = np.vstack([targets, df2.loc[:4, -1:]])
+    df3 = pd.read_csv('problemXOR.csv', header=None)
+    inputs = np.vstack([inputs, df3.iloc[:4, :2]])
+    targets = np.vstack([targets, df3.loc[:4, -1:]])
+
+    df4 = pd.read_csv('problemAND.csv', header=None)
+    inputsTeste = df4.iloc[:4, :2].values
+    targetsTeste = df4.iloc[:4, -1:].values
+    df5 = pd.read_csv('problemOR.csv', header=None)
+    inputsTeste = np.vstack([inputsTeste, df5.iloc[:4, :2]])
+    targetsTeste = np.vstack([targetsTeste, df5.loc[:4, -1:]])
+    df6 = pd.read_csv('problemXOR.csv', header=None)
+    inputsTeste = np.vstack([inputsTeste, df6.iloc[:4, :2]])
+    targetsTeste = np.vstack([targetsTeste, df6.loc[:4, -1:]])
+
+    return inputs, targets, inputsTeste, targetsTeste
+
 def main():
     inputs, targets = extracaoDataTreino()
+    inputsTeste, targetsTeste = extracaoDataTeste()
+    #inputs, targets, inputsTeste, targetsTeste = extracaoPortaLogica()
+
     learningRate = 0.1
     epochs = 10000
     maxError = 0.1
     input_length = 63
-    hidden_length = 10
+    hidden_length = 63
     output_length = 7
     hidden = np.zeros(hidden_length)
     output = np.zeros(output_length)
@@ -78,15 +123,10 @@ def main():
 
     print('fim das épocas')
 
-# TESTES - ultimas 6 linhas do arquivo csv
-    dfFinal = pd.read_csv('caracteres-limpo.csv', header=None)
-    entradas = dfFinal.iloc[:-6, :63].values
-    saidasEsperadas = dfFinal.iloc[:-6, -7:].values
-
 # print dos valores finais dos testes
     for i in range(len(inputs)):
-        input = entradas[i]
-        target = saidasEsperadas[i]
+        input = inputsTeste[i]
+        target = targetsTeste[i]
         hidden, output, hiddenActivation, outputFinal, wsHidden, wsOutput = mlp_forward(input, hidden, output, weights_hidden, weights_output)
         print('Entrada:', input)
         print('Target:', target)
