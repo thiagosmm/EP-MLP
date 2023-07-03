@@ -85,9 +85,9 @@ def main():
     inputsTeste, targetsTeste = extracaoDataTeste()
     #inputs, targets, inputsTeste, targetsTeste = extracaoPortaLogica()
 
-    learningRate = 0.1
+    learningRate = 0.2
     epochs = 10000
-    maxError = 0.01
+    maxError = 0.001
     input_length = 63
     hidden_length = 30
     output_length = 7
@@ -97,23 +97,24 @@ def main():
 
 # TREINAMENTO - arquivos .csv que contém ruído
 
-    for i in range(len(inputs)):
-        input = inputs[i]
-        target = targets[i]
-
-        for j in range(epochs):
+    for j in range(epochs):
+        error = 0
+        for i in range(len(inputs)):
+            input = inputs[i]
+            target = targets[i]
             hidden, output, hiddenActivation, outputFinal, weights_hidden, weights_output = mlp_forward(input, hidden, output, weights_hidden, weights_output)
             output, outputFinal, hidden, weights_hidden, weights_output = mlp_backpropagation(input, output, outputFinal, target, hidden, hiddenActivation, weights_hidden, weights_output, learningRate)
 
-            error = 0.5 * (np.sum(target - outputFinal))**2
-            print('época: ', j, 'valor do erro: ', error)
+            error += 1/len(inputs) * (np.sum(target - outputFinal))**2
+            print('época: ', j, 'input: ',i, 'valor do erro: ', error)
 
-            if error < maxError:
-                print('parada devido ao valor do erro')
+            if error <= maxError:
+                print('parada devido ao valor do erro --- erro: ', error)
                 break
-
+        print('ERRO QUADRÁTICO MÉDIO da epoca ', j,': ', error)
     print('fim das épocas')
 
+# -------------- TESTES --------------------
 # print dos valores finais dos testes
     rightAns = 0
     for i in range(len(inputsTeste)):
