@@ -181,11 +181,12 @@ def main():
         resposta.append(rightAns)
         todosIndicesEsperados.extend(indicesEsperados)
         todosIndicesPrevistos.extend(indicesPrevistos)
-
+    print(resposta)
     dados_mediaDesv.append([np.mean(resposta), np.std(resposta)])
 
 # matriz de confusão com todos os testes (das 5 iterações do holdout)
     matrizConfusaoGeral = confusion_matrix(todosIndicesEsperados, todosIndicesPrevistos)
+    print(matrizConfusaoGeral)
 
 # chamada à função para criar o arquivo excel que contém: hiperparâmetros, pesos iniciais e finais, erros de cada iteração, outputs de cada iteração, matriz de confusão e média e desvio padrão
     paraExcel(dados_hiperparametros, weights_hidden, weights_output, dados_errosIteracoes, dados_outputs, matrizConfusaoGeral, dados_mediaDesv, df_pesosIniciaisHidden, df_pesosIniciaisOutput)
